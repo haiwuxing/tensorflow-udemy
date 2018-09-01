@@ -3,6 +3,14 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 
+import os
+# windows 系统加上当前目录，其他系统默认目录为当前目录
+# windows 的默认目录为 C:\Users\UserName\
+dir = ''
+if (os.name == 'nt'):
+    scriptpath = os.path.realpath(__file__)
+    dir = os.path.dirname(scriptpath)
+
 x_data = np.linspace(0,10,10) + np.random.uniform(-1.5,1.5,10)
 m = 0.3
 b = 0.6
@@ -15,8 +23,8 @@ plt.plot(x_data,y_label)
 #plt.show()
 
 # 随机值，1.0，1.0
-m_tensor = tf.Variable(1.0)
-b_tensor = tf.Variable(1.0)
+m_tensor = tf.Variable(1.0, name='m')
+b_tensor = tf.Variable(1.0, name='b')
 
 # 计算出所有的错误
 error = 0
@@ -32,6 +40,8 @@ init = tf.global_variables_initializer()
 
 # 训练
 with tf.Session() as sess:
+    writer = tf.summary.FileWriter(dir + './graphs', sess.graph)
+
     sess.run(init)
 
     print('error=', error.eval())
@@ -42,6 +52,7 @@ with tf.Session() as sess:
         print('m_tensor=',m_tensor.eval(), 'b_tensor=', b_tensor.eval(), 'error=', error.eval())
     
     final_slope, final_intercept = sess.run([m_tensor,b_tensor])
+writer.close()
 
 print('\n')
 print('final_slope=',final_slope,'final_intercept=', final_intercept)
